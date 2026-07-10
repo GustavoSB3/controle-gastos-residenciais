@@ -14,10 +14,11 @@ public class TransacaoService(AppDbContext db)
 
     public async Task<(TransacaoDto? Transacao, string? Erro)> CriarAsync(CriarTransacaoDto dto)
     {
+        // Primeiro confere se o id recebido pertence a uma pessoa cadastrada.
         var pessoa = await db.Pessoas.FindAsync(dto.PessoaId);
         if (pessoa is null) return (null, "A pessoa informada não existe.");
 
-        // Menores de idade podem registrar despesas, mas nunca receitas.
+        // Esta é a regra do sistema: menor de idade só pode cadastrar despesa.
         if (pessoa.Idade < 18 && dto.Tipo == TipoTransacao.Receita)
             return (null, "Pessoas menores de 18 anos só podem registrar despesas.");
 

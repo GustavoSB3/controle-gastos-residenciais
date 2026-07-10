@@ -22,6 +22,7 @@ public class PessoaService(AppDbContext db)
     public async Task<bool> ExcluirAsync(int id)
     {
         var pessoa = await db.Pessoas.FindAsync(id);
+        // Retorna false para o controller responder com 404 quando não encontrar.
         if (pessoa is null) return false;
         db.Pessoas.Remove(pessoa);
         await db.SaveChangesAsync();

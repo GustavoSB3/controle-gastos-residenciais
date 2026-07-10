@@ -12,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<PessoaService>();
 builder.Services.AddScoped<TransacaoService>();
 builder.Services.AddScoped<TotaisService>();
+// Libera as chamadas do frontend que está rodando pelo Vite.
 builder.Services.AddCors(options => options.AddPolicy("Frontend", policy =>
     policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod()));
 
@@ -25,6 +26,7 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
+    // Cria o banco e as tabelas na primeira vez que o projeto for executado.
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
 }

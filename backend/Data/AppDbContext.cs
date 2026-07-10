@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Aqui ficam as regras das colunas que serão criadas no banco.
         modelBuilder.Entity<Pessoa>().Property(p => p.Nome).HasMaxLength(120).IsRequired();
         modelBuilder.Entity<Transacao>().Property(t => t.Descricao).HasMaxLength(200).IsRequired();
         modelBuilder.Entity<Transacao>().Property(t => t.Valor).HasPrecision(18, 2);
@@ -18,7 +19,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne(t => t.Pessoa)
             .WithMany(p => p.Transacoes)
             .HasForeignKey(t => t.PessoaId)
-            // Garante que as transações sejam removidas junto com a pessoa vinculada.
+            // Se uma pessoa for excluída, as transações dela também são apagadas.
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

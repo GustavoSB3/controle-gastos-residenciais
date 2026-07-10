@@ -9,8 +9,8 @@ public class TotaisService(AppDbContext db)
 {
     public async Task<TotaisDto> ObterAsync()
     {
-        // O SQLite não agrega valores decimal. Carregamos somente os dados necessários
-        // e calculamos os totais em memória, mantendo a precisão monetária.
+        // O SQLite não consegue somar decimal direto nesta consulta.
+        // Por isso buscamos os dados primeiro e fazemos as contas logo abaixo.
         var dados = await db.Pessoas.AsNoTracking()
             .OrderBy(p => p.Nome)
             .Select(p => new
@@ -21,6 +21,7 @@ public class TotaisService(AppDbContext db)
             })
             .ToListAsync();
 
+        // Calcula as receitas e despesas separadamente para cada pessoa.
         var pessoas = dados.Select(p =>
         {
             var receitas = p.Transacoes

@@ -12,6 +12,7 @@ export function TransacoesPage() {
   const [pessoaId, setPessoaId] = useState('')
   const [mensagem, setMensagem] = useState('')
 
+  // Atualiza as duas listas juntas e já seleciona a primeira pessoa disponível.
   const atualizarListas = ([p, t]: [Pessoa[], Transacao[]]) => {
     setPessoas(p); setTransacoes(t)
     setPessoaId(atual => atual || (p[0] ? String(p[0].id) : ''))
