@@ -1,9 +1,9 @@
-namespace backend.Models
+namespace ControleGastos.Api.Models;
+
+public class Pessoa
 {
-    public class Pessoa
-    {
-        public int id  { get; set; }
-        public string Nome { get; set; } = string.Empty;
-        public int Idade { get; set; }
-    }
+    public int Id { get; set; }
+    public required string Nome { get; set; }
+    public int Idade { get; set; }
+    public ICollection<Transacao> Transacoes { get; set; } = [];
 }
