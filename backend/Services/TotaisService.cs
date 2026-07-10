@@ -9,16 +9,29 @@ public class TotaisService(AppDbContext db)
 {
     public async Task<TotaisDto> ObterAsync()
     {
-        // Os agrupamentos são calculados no banco e incluem pessoas sem transações.
-        var pessoas = await db.Pessoas.AsNoTracking().OrderBy(p => p.Nome)
-            .Select(p => new TotalPessoaDto(
+        // O SQLite não agrega valores decimal. Carregamos somente os dados necessários
+        // e calculamos os totais em memória, mantendo a precisão monetária.
+        var dados = await db.Pessoas.AsNoTracking()
+            .OrderBy(p => p.Nome)
+            .Select(p => new
+            {
                 p.Id,
                 p.Nome,
-                p.Transacoes.Where(t => t.Tipo == TipoTransacao.Receita).Sum(t => (decimal?)t.Valor) ?? 0,
-                p.Transacoes.Where(t => t.Tipo == TipoTransacao.Despesa).Sum(t => (decimal?)t.Valor) ?? 0,
-                (p.Transacoes.Where(t => t.Tipo == TipoTransacao.Receita).Sum(t => (decimal?)t.Valor) ?? 0) -
-                (p.Transacoes.Where(t => t.Tipo == TipoTransacao.Despesa).Sum(t => (decimal?)t.Valor) ?? 0)))
+                Transacoes = p.Transacoes.Select(t => new { t.Tipo, t.Valor }).ToList()
+            })
             .ToListAsync();
+
+        var pessoas = dados.Select(p =>
+        {
+            var receitas = p.Transacoes
+                .Where(t => t.Tipo == TipoTransacao.Receita)
+                .Sum(t => t.Valor);
+            var despesas = p.Transacoes
+                .Where(t => t.Tipo == TipoTransacao.Despesa)
+                .Sum(t => t.Valor);
+
+            return new TotalPessoaDto(p.Id, p.Nome, receitas, despesas, receitas - despesas);
+        }).ToList();
 
         var receitas = pessoas.Sum(p => p.TotalReceitas);
         var despesas = pessoas.Sum(p => p.TotalDespesas);
