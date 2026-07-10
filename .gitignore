@@ -459,6 +459,11 @@ Thumbs.db
 ehthumbs.db
 ehthumbs_vista.db
 
+# Local SQLite databases
+*.db
+*.db-shm
+*.db-wal
+
 # Dump file
 *.stackdump
 
